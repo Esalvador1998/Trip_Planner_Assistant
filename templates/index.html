@@ -1,0 +1,232 @@
+<<!DOCTYPE html>
+<html>
+<head>
+    <title>Trip Planner Assistant</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+        }
+
+        .assistant-container {
+            width: 400px;
+            background-color: #1f1f1f;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            margin: 50px auto;
+        }
+
+        .assistant-header {
+            background-color: #212121;
+            color: #fff;
+            padding: 15px;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .assistant-body {
+            padding: 15px;
+            height: 300px;
+            overflow-y: auto;
+        }
+
+        .assistant-message {
+            margin-bottom: 10px;
+        }
+
+        .user-message {
+            text-align: right;
+        }
+
+        .assistant-message .message-text {
+            background-color: #007bff;
+            color: #fff;
+            padding: 10px 15px;
+            border-radius: 8px;
+            display: inline-block;
+        }
+
+        .assistant-message .message-text.inline {
+            background-color: transparent;
+            color: #007bff;
+            border: 1px solid #007bff;
+            padding: 5px 10px;
+            border-radius: 20px;
+            display: inline-block;
+        }
+
+        .assistant-input {
+            display: flex;
+            margin-top: 15px;
+        }
+
+        .assistant-input input[type="text"],
+        .assistant-input input[type="number"] {
+            flex: 1;
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #333;
+            color: #fff;
+        }
+
+        .assistant-input button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .assistant-recommendations {
+            margin-top: 20px;
+        }
+
+        .assistant-recommendations ul {
+            padding: 0;
+            list-style-type: none;
+        }
+
+        .assistant-recommendations ul li {
+            margin-bottom: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="assistant-container">
+        <div class="assistant-header">Trip Planner Assistant</div>
+        <div class="assistant-body" id="assistant-body">
+            <div class="assistant-message">
+                <span class="message-text">Hello! I'm your personal assistant for trip planning.</span>
+            </div>
+            <div class="assistant-message">
+                <span class="message-text">Let's get started. Please provide the following details:</span>
+            </div>
+            <div class="assistant-message">
+                <span class="message-text">Destination:</span>
+                <input type="text" id="destination-input" placeholder="Enter destination">
+            </div>
+            <div class="assistant-message">
+                <span class="message-text">Travel Dates:</span>
+                <input type="text" id="dates-input" placeholder="Enter travel dates">
+            </div>
+            <div class="assistant-message">
+                <span class="message-text">Budget:</span>
+                <input type="number" id="budget-input" placeholder="Enter budget">
+            </div>
+            <div class="assistant-message">
+                <span class="message-text">Interests:</span>
+                <input type="text" id="interests-input" placeholder="Enter interests">
+            </div>
+        </div>
+        <div class="assistant-input">
+            <button id="submit-btn">Submit</button>
+        </div>
+        <div class="assistant-recommendations" id="assistant-recommendations">
+            <!-- Recommendations will be dynamically added here -->
+        </div>
+    </div>
+
+    <script>
+        const destinationInput = document.getElementById('destination-input');
+        const datesInput = document.getElementById('dates-input');
+        const budgetInput = document.getElementById('budget-input');
+        const interestsInput = document.getElementById('interests-input');
+        const submitBtn = document.getElementById('submit-btn');
+        const recommendationsContainer = document.getElementById('assistant-recommendations');
+
+        submitBtn.addEventListener('click', submitForm);
+
+        function submitForm() {
+            const destination = destinationInput.value.trim();
+            const dates = datesInput.value.trim();
+            const budget = budgetInput.value.trim();
+            const interests = interestsInput.value.trim();
+
+            // You can add code here to validate and process the form data
+
+            // Display user input for demonstration purposes
+            displayAssistantMessage(`Destination: ${destination}`);
+            displayAssistantMessage(`Travel Dates: ${dates}`);
+            displayAssistantMessage(`Budget: ${budget}`);
+            displayAssistantMessage(`Interests: ${interests}`);
+
+            // Call the API or perform further processing with the form data
+            // You can replace this with your logic to provide vacation suggestions
+
+            // For demonstration purposes, display some recommendations
+            displayRecommendations(['Flight options', 'Accommodation suggestions', 'Top attractions']);
+
+            // Clear input fields after submitting
+            destinationInput.value = '';
+            datesInput.value = '';
+            budgetInput.value = '';
+            interestsInput.value = '';
+        }
+
+        function displayAssistantMessage(message) {
+            const assistantMessage = document.createElement('div');
+            assistantMessage.classList.add('assistant-message', 'chat-message');
+            assistantMessage.innerHTML = `<span class="message-text">${message}</span>`;
+            assistantBody.appendChild(assistantMessage);
+        }
+
+        function displayRecommendations(recommendations) {
+    const recommendationsList = document.createElement('ul');
+    recommendations.forEach((rec) => {
+        const listItem = document.createElement('li');
+        listItem.textContent = rec;
+        recommendationsList.appendChild(listItem);
+    });
+    recommendationsContainer.innerHTML = ''; // Clear previous recommendations
+    recommendationsContainer.appendChild(recommendationsList);
+    function getItineraryRecommendations(destination, dates, budget, interests) {
+    const tripDuration = calculateTripDuration(dates);
+    const daysPerActivity = Math.ceil(tripDuration / interests.length);
+
+    const itinerary = [];
+
+    interests.forEach((interest) => {
+        const prompt = `User: I'm planning a trip to ${destination} from ${formatDate(
+            dates[0]
+        )} to ${formatDate(dates[1])}. My budget is ${budget}. I'm interested in ${interest}.`;
+
+        const response = askChatGPT(prompt);
+
+        const activities = response.choices.map((choice) => choice.text.trim());
+        const selectedActivities = activities.slice(0, daysPerActivity);
+
+        itinerary.push(`Day ${itinerary.length + 1}: ${interest}`);
+        selectedActivities.forEach((activity) => {
+            itinerary.push(activity);
+        });
+    });
+
+    return itinerary;
+}
+
+function calculateTripDuration(dates) {
+    const startDate = new Date(dates[0]);
+    const endDate = new Date(dates[1]);
+    const timeDiff = Math.abs(endDate.getTime() - startDate.getTime());
+    const tripDuration = Math.ceil(timeDiff / (1000 * 60 * 60 * 24));
+    return tripDuration;
+}
+
+function formatDate(dateString) {
+    const date = new Date(dateString);
+    return date.toDateString();
+}
+
+async function askChatGPT(prompt) {
+    const response = await fetch('/get_response?msg=' + encodeURIComponent(prompt));
+    const data = await response.json();
+    return data.response;
+}
+
+}
