@@ -3,7 +3,7 @@ import streamlit as st
 import requests
 
 # Set up OpenAI API
-openai.api_key = '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'
+openai.api_key = ''
 
 
 # Chatbot function
